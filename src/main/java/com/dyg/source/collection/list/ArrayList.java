@@ -294,15 +294,17 @@ public class ArrayList<E> extends AbstractList<E>
     }
 
     /**
-     * 返回此ArrayList实例的深拷贝副本。 （元素本身将会被复制到新的地址中）
+     * 返回此ArrayList实例的深拷贝副本。 （元素本身将会被复制到新的地址中,当对新的拷贝副本进行操作时，不会影响到原List实例的元素值）
      *
      * @return ArrayList实例的深拷贝副本
      */
     @Override
     public Object clone() {
         try {
-            //调用Object的clone方法，进行
+            //调用Object的clone方法，进行对象的复制，
+            //将复制本对象及其内所有基本数据类型和String类型成员，但不复制对象成员、饮用对象
             ArrayList<?> v = (ArrayList<?>) super.clone();
+            //对需要进行复制的引用变量，进行独立的拷贝：将存储的元素移入新的 ArrayList 中
             v.elementData = Arrays.copyOf(elementData, size);
             v.modCount = 0;
             return v;
@@ -313,18 +315,16 @@ public class ArrayList<E> extends AbstractList<E>
     }
 
     /**
-     * Returns an array containing all of the elements in this list
-     * in proper sequence (from first to last element).
+     * toArray 方法是 返回ArrayList中的Object数组，即elementData
      *
-     * <p>The returned array will be "safe" in that no references to it are
-     * maintained by this list.  (In other words, this method must allocate
-     * a new array).  The caller is thus free to modify the returned array.
-     *
-     * <p>This method acts as bridge between array-based and collection-based
-     * APIs.
-     *
-     * @return an array containing all of the elements in this list in
-     *         proper sequence
+     * 返回的对象是通过Arrays.copyOf（源数组,数组长度）的方法进行深拷贝获取的，
+     * 最终调用的是native方法 System.arraycopy(Object src,  int  srcPos,
+     *                                         Object dest, int destPos,
+     *                                         int length);
+     * 因此，对返回的数组进行操作并不会印象ArrayList的elementData数组
+     * 通过该方法返回的数组中元素的顺序和elementData中一致
+     * @author dongyinggang
+     * @date 2020/9/27 14:17
      */
     @Override
     public Object[] toArray() {
@@ -332,46 +332,42 @@ public class ArrayList<E> extends AbstractList<E>
     }
 
     /**
-     * Returns an array containing all of the elements in this list in proper
-     * sequence (from first to last element); the runtime type of the returned
-     * array is that of the specified array.  If the list fits in the
-     * specified array, it is returned therein.  Otherwise, a new array is
-     * allocated with the runtime type of the specified array and the size of
-     * this list.
-     *
-     * <p>If the list fits in the specified array with room to spare
-     * (i.e., the array has more elements than the list), the element in
-     * the array immediately following the end of the collection is set to
-     * <tt>null</tt>.  (This is useful in determining the length of the
-     * list <i>only</i> if the caller knows that the list does not contain
-     * any null elements.)
-     *
-     * @param a the array into which the elements of the list are to
-     *          be stored, if it is big enough; otherwise, a new array of the
-     *          same runtime type is allocated for this purpose.
-     * @return an array containing the elements of the list
-     * @throws ArrayStoreException if the runtime type of the specified array
-     *         is not a supertype of the runtime type of every element in
-     *         this list
-     * @throws NullPointerException if the specified array is null
+     * toArray 方法是 返回 ArrayList 元素组成的数组
+     * 
+     * @param a 需要存储 list 中元素的数组
+     * @return 新构造的含elementData所有值的数组，或是被覆盖写入elementData值的a（可能剩余几个a本身的元素）
+     * @author dongyinggang
+     * @date 2020/9/27 14:23
+     * @throws ArrayStoreException 当 a.getClass() != list 中存储元素的类型时
+     * @throws NullPointerException 当 a 为 null 时
      */
     @Override
     @SuppressWarnings("unchecked")
     public <T> T[] toArray(T[] a) {
+        //如果a的长度小于elementData的元素数量，那么返回的就是通过copyOf重新构造的数组
         if (a.length < size)
-            // Make a new array of a's runtime type, but my contents:
         {
             return (T[]) Arrays.copyOf(elementData, size, a.getClass());
         }
+        //如果a的长度>=size,则将 list 中的元素按顺序存入 a 的前 size 个位置中
         System.arraycopy(elementData, 0, a, 0, size);
+        //然后,如果a的长度>size a[list.size] = null, a[list.size + 1] 及其后的元素依旧是 a 的元素
         if (a.length > size) {
+            //感觉这里的null很可能会让人感觉toArray结果和预期不一致
             a[size] = null;
         }
         return a;
     }
 
-    // Positional Access Operations
 
+    /**
+     * elementData 方法是
+     *
+     * @param index
+     * @return
+     * @author dongyinggang
+     * @date 2020/9/27 15:19
+     */
     @SuppressWarnings("unchecked")
     E elementData(int index) {
         return (E) elementData[index];
