@@ -361,10 +361,11 @@ public class ArrayList<E> extends AbstractList<E>
 
 
     /**
-     * elementData 方法是
+     * elementData 方法是 获取elementData的index下标的元素
+     * 如果index是个负数,则直接抛出一个ArrayIndexOutOfBoundsException异常
      *
-     * @param index
-     * @return
+     * @param index 下标
+     * @return 目标下标的元素
      * @author dongyinggang
      * @date 2020/9/27 15:19
      */
@@ -374,46 +375,50 @@ public class ArrayList<E> extends AbstractList<E>
     }
 
     /**
-     * Returns the element at the specified position in this list.
+     * 根据下标index查询元素
      *
-     * @param  index index of the element to return
-     * @return the element at the specified position in this list
-     * @throws IndexOutOfBoundsException {@inheritDoc}
+     * @param  index 要返回的元素的下标
+     * @return 下标指向的元素
+     * @throws  IndexOutOfBoundsException {@inheritDoc} 下标越界异常
      */
     @Override
     public E get(int index) {
+        //rangeCheck判断index和size的大小，如果index>=size，则抛出下标越界异常
         rangeCheck(index);
-
+        //调用elementData(index)获取目标元素
         return elementData(index);
     }
 
     /**
-     * Replaces the element at the specified position in this list with
-     * the specified element.
+     * 将入参中的element对象写入指定下标index位置，覆盖原值
      *
-     * @param index index of the element to replace
-     * @param element element to be stored at the specified position
-     * @return the element previously at the specified position
-     * @throws IndexOutOfBoundsException {@inheritDoc}
+     * @param index 要被修改的下标值
+     * @param element 要存储在指定位置的元素
+     * @return 先前位于指定位置的元素
+     * @throws IndexOutOfBoundsException {@inheritDoc} 数组越界异常
      */
     @Override
     public E set(int index, E element) {
+        //判断index和size的大小，如果index>=size，则抛出下标越界异常
         rangeCheck(index);
-
+        //获取指定下标的元素
         E oldValue = elementData(index);
+        //修改指定下标为新的元素
         elementData[index] = element;
+        //将先前位于指定位置的元素返回
         return oldValue;
     }
 
     /**
-     * Appends the specified element to the end of this list.
+     * 将指定元素写入到list的尾部
      *
-     * @param e element to be appended to this list
+     * @param e 需要被添加到list的元素
      * @return <tt>true</tt> (as specified by {@link Collection#add})
      */
     @Override
     public boolean add(E e) {
-        ensureCapacityInternal(size + 1);  // Increments modCount!!
+        //调用ensureCapacityInternal(int) 进行扩容，会将modCount进行+1操作
+        ensureCapacityInternal(size + 1);
         elementData[size++] = e;
         return true;
     }
@@ -612,12 +617,13 @@ public class ArrayList<E> extends AbstractList<E>
     }
 
     /**
-     * Checks if the given index is in range.  If not, throws an appropriate
-     * runtime exception.  This method does *not* check if the index is
-     * negative: It is always used immediately prior to an array access,
-     * which throws an ArrayIndexOutOfBoundsException if index is negative.
+     * 检查给定的索引是否在范围内。
+     * 如果不是，则抛出适当的运行时异常。
+     * 此方法不检查索引是否为负：调用elementData方法时，如果索引为负，则抛出ArrayIndexOutOfBoundsException。
+     * 如果index>=size，则抛出下标越界异常
      */
     private void rangeCheck(int index) {
+        //判断index和size的大小，如果index>=size，则抛出下标越界异常
         if (index >= size) {
             throw new IndexOutOfBoundsException(outOfBoundsMsg(index));
         }
@@ -633,9 +639,8 @@ public class ArrayList<E> extends AbstractList<E>
     }
 
     /**
-     * Constructs an IndexOutOfBoundsException detail message.
-     * Of the many possible refactorings of the error handling code,
-     * this "outlining" performs best with both server and client VMs.
+     * 构造一个IndexOutOfBoundsException详细信息。
+     * 在错误处理代码的许多可能重构中，此“概述”在服务器和客户端VM上均表现最佳。
      */
     private String outOfBoundsMsg(int index) {
         return "Index: "+index+", Size: "+size;

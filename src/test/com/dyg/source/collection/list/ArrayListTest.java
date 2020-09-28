@@ -5,12 +5,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.BeanUtils;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.Arrays;
-
-import static org.junit.Assert.*;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * ArrayListTest 类是 ArrayList测试类
@@ -23,21 +25,14 @@ import static org.junit.Assert.*;
 @SpringBootTest(classes = SourceApplication.class)
 public class ArrayListTest {
 
-    //通过匿名内部类的方式初始化
-    private ArrayList<String> testList = new ArrayList<String>() {
-        //实际是声明了一个继承ArrayList的匿名内部类,以下实际是匿名内部类的一个代码块
-        //这种方式的声明实际不是一个好方案，是一个典型的反面模式（anti-pattern），最重要的是有可能会造成内存泄漏的风险
-        // 详情参见：
-        // 1.Java中的双大括号初始化:https://blog.csdn.net/Yaokai_AssultMaster/article/details/52188735
-        // 2.java-双大括号实例初始化的反模式：https://www.cnblogs.com/wenbronk/p/7000643.html
-        {
-            add("1");
-            add("2");
-            add("3");
-            System.out.println("通过匿名内部类进行 ArrayList 初始化 {}"
-                    + Arrays.toString(elementData));
-        }
-    };
+
+    private static ArrayList<String> initList = new ArrayList<>();
+    static {
+        initList.add("1");
+        initList.add("2");
+        initList.add("3");
+    }
+
 
     @Test
     public void trimToSize() {
@@ -71,7 +66,33 @@ public class ArrayListTest {
 
     @Test
     public void elementData() {
-        Assert.assertEquals("2", testList.elementData(1));
 
+        Assert.assertEquals("2", initList.elementData(1));
+
+    }
+
+    @Test
+    public void get() {
+        //测试下标为负数抛出的ArrayIndexOutOfBoundsException异常
+        try{
+            log.info(initList.get(-1));
+        }catch (ArrayIndexOutOfBoundsException e){
+            log.error("ArrayIndexOutOfBoundsException异常信息",e);
+            Assert.assertEquals("-1",e.getMessage());
+        }
+        //测试下标越界抛出的IndexOutOfBoundsException异常结果
+        try{
+            log.info(initList.get(100));
+        }catch (IndexOutOfBoundsException e){
+            log.error("IndexOutOfBoundsException异常信息",e);
+            Assert.assertEquals("Index: 100, Size: "+ initList.size(),e.getMessage());
+        }
+        Assert.assertEquals("2",initList.get(1));
+    }
+
+    @Test
+    public void add() {
+        //测试add调用链
+        initList.add("4");
     }
 }
