@@ -41,5 +41,6 @@ public class ToArrayBug {
 
         //  java.lang.ArrayStoreException
         strs2[0] = new Object();
+
     }
 }
