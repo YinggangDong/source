@@ -64,17 +64,24 @@ public class PriorityQueueDemo {
     private static int partition(int[] arr,int left,int right){
         int x = arr[left];
         while(left<right){
+            //从右侧开始找到第一个小于基准元素的元素
             while(arr[right]>=x&&left <right){
                 right--;
             }
+            //把该元素赋值给当前左指针指向的位置
             arr[left] = arr[right];
+            //从左侧开始找第一个大于基准元素的元素
             while(arr[left]<x&&left<right){
                 left++;
             }
+            //把该元素赋值给右指针指向的位置
+            //如果是left<right不满足,此时right=left,互换无所谓
             arr[right]=arr[left];
-
         }
+        //上述遍历完成后,就实现了基准元素左侧全不大于它，右侧全不小于它
+        //此时,将基准元素设置给遍历重叠时的位置
         arr[left]=x;
+        //返回此次的基准元素值
         return left;
     }
 }
